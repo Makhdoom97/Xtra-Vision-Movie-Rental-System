@@ -1,0 +1,272 @@
+/*//the project is done by Makhdoom and Ali collaboration. its the main method. 
+and my college did the classes to balance the work load
+
+
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.mycompany.xtravisionmovierentalsystem;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+public class Main {
+
+    static List<Movie> movies ;
+    static CardDetail cardDetail ;
+    static User user;
+
+    public static void main(String[] args) {
+
+        System.out.println("Line");
+
+        Scanner scanner = new Scanner(System.in);  // Create a Scanner object
+
+        do{
+            movies = new ArrayList<>();
+            String name,email;
+            System.out.println("Enter Your Name: ");
+            name = scanner.nextLine();
+            System.out.println("Enter Your Email Address: ");
+            email = scanner.nextLine();
+
+            user = new User(name, email);
+
+            System.out.println("\n\nWelcome " + user.getUsername() + " to Xtra-Vision Movie Rental System\n");
+
+
+            System.out.println("Enter 1 For rent The Movie Disk");
+            System.out.println("Enter 2 For return The Movie Disk");
+
+            int decision = scanner.nextInt();
+            scanner.nextLine();
+
+            movies.add(new Movie(1,8.1, "The 400 Blows","A young boy, left without attention, delves into a life of petty crime."));
+            movies.add(new Movie(2,7.1, "La Haine","24 hours in the lives of three young men in the French suburbs the day after a violent riot."));
+            movies.add(new Movie(3,8.8, "The Godfather","An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son."));
+            movies.add(new Movie(4,9.1, "The Godfather: Part II","The early life and career of Vito Corleone in 1920s New York City is portrayed, while his son, Michael, expands and tightens his grip on the family crime syndicate."));
+            movies.add(new Movie(5,9.5, "Man Bites Dog","A film crew follows a ruthless thief and heartless killer as he goes about his daily routine. But complications set in when the film crew lose their objectivity and begin lending a hand."));
+            movies.add(new Movie(6,6.1, "The Departed","An undercover cop and a mole in the police attempt to identify each other while infiltrating an Irish gang in South Boston."));
+            movies.add(new Movie(7,5.9, "Umberto D","An elderly man and his dog struggle to survive on his government pension in Rome."));
+            movies.add(new Movie(8,8.7, "White Heat","A psychopathic criminal with a mother complex makes a daring break from prison and leads his old gang in a chemical plant payroll heist."));
+            movies.add(new Movie(9,3.2, "Eddie Murphy: Raw","Eddie Murphy in a stand-up performance recorded live. For an hour and a half he talks about his favourite subjects: sex and women."));
+            movies.add(new Movie(1,8.1, "The 400 Blows","A young boy, left without attention, delves into a life of petty crime."));
+            movies.add(new Movie(2,7.1, "La Haine","24 hours in the lives of three young men in the French suburbs the day after a violent riot."));
+            movies.add(new Movie(3,8.8, "The Godfather","An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son."));
+            movies.add(new Movie(4,9.1, "The Godfather: Part II","The early life and career of Vito Corleone in 1920s New York City is portrayed, while his son, Michael, expands and tightens his grip on the family crime syndicate."));
+            movies.add(new Movie(5,9.5, "Man Bites Dog","A film crew follows a ruthless thief and heartless killer as he goes about his daily routine. But complications set in when the film crew lose their objectivity and begin lending a hand."));
+            movies.add(new Movie(6,6.1, "The Departed","An undercover cop and a mole in the police attempt to identify each other while infiltrating an Irish gang in South Boston."));
+            movies.add(new Movie(7,5.9, "Umberto D","An elderly man and his dog struggle to survive on his government pension in Rome."));
+            movies.add(new Movie(8,8.7, "White Heat","A psychopathic criminal with a mother complex makes a daring break from prison and leads his old gang in a chemical plant payroll heist."));
+            movies.add(new Movie(9,3.2, "Eddie Murphy: Raw","Eddie Murphy in a stand-up performance recorded live. For an hour and a half he talks about his favourite subjects: sex and women."));
+
+            printMoviesBasicInfo();
+
+            if(decision==1){
+                rentAMovie(scanner);
+            }else{
+                returnAMovie(scanner);
+            }
+        }while(true);
+    }
+
+    public static void returnAMovie(Scanner scanner){
+        System.out.println("Enter Id of the Movie to return");
+
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        try {
+            returnTheMovie(id, scanner);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public static void returnTheMovie(int id, Scanner scanner) throws IOException{
+
+        boolean isFind = false;
+
+        int days = 0;
+        File inputFile = new File("rentMoviesData.txt");
+        File tempFile = new File("temp.txt");
+
+        BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+
+        String lineToRemove = id+"";
+        String currentLine;
+
+        while((currentLine = reader.readLine()) != null) {
+            // trim newline when comparing with lineToRemove
+            String[] trimmedWords = currentLine.trim().split("#");
+            if(trimmedWords[0].equals(lineToRemove) && trimmedWords[2].equals(user.getEmail())){
+                try {
+                    isFind = true;
+//                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+//                LocalDate date1 = LocalDate.parse(trimmedWords[3], dtf);
+//                Date date = new Date();
+//                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+//                String strDate = formatter.format(date);
+//                LocalDate date2 = LocalDate.parse(strDate, dtf);
+//                long daysBetween = Duration.between(date1, date2).toDays();
+
+
+
+
+                    Date date = new Date();
+                    SimpleDateFormat formattert = new SimpleDateFormat("MM/dd/yyyy");
+                    String strDate = formattert.format(date);
+
+                    final String firstInput = trimmedWords[3];
+                    final String secondInput = strDate;
+
+
+                    Date d1 = null;
+                    Date d2 = null;
+
+                    d1 = formattert.parse(firstInput);
+                    d2 = formattert.parse(secondInput);
+
+                    //in milliseconds
+                    long diff = d2.getTime() - d1.getTime();
+
+
+                    long diffDays = diff / (24 * 60 * 60 * 1000);
+
+
+
+
+                    days = (int) diffDays;
+                    continue;
+                } catch (ParseException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            writer.write(currentLine + System.getProperty("line.separator"));
+        }
+        writer.close();
+        reader.close();
+        //Delete the original file
+        if (!inputFile.delete()) {
+            System.out.println("Could not delete file");
+            return;
+        }
+
+        //Rename the new file to the filename the original file had.
+        if (!tempFile.renameTo(inputFile))
+            System.out.println("Could not rename file");
+
+        if(isFind){
+            System.out.println("\nYou returned the Movie Successfully\n");
+            System.out.println("Initial Charges: €3\n");
+            if(days>2){
+                days--;
+                double rent = 3 + (days*1.5);
+                System.out.println("You returned after " + days + " no of days\nSo your total rent is: " + rent +"\n" );
+
+            }
+        }else{
+            System.out.println("\nDid not find any record related to this email: " + user.getEmail()+" \n");
+        }
+    }
+
+    public static void rentAMovie(Scanner scanner){
+
+
+
+        System.out.println("Enter the ID of the Movie For Rent");
+        int idForRent = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("\nThe initial charge of €3 is processed as soon as you rent your disc.\nAny additional charges are charged when a disc is returned\n");
+        System.out.println("\nIf you want to hold onto your disc for longer there is no problem. For each additional day, you’ll be charged €1.50. If you hold onto your disc for the maximum rental period – 10 days, you will be charged a maximum fee of €15 and the disc is yours to keep\n\n");
+
+
+        getCardDetails(scanner);
+
+
+        rentTheMovie(idForRent, scanner);
+
+
+    }
+
+    public static void rentTheMovie(int id, Scanner scanner){
+        try
+        {
+            Date date = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+            String strDate = formatter.format(date);
+
+
+            String filename= "rentMoviesData.txt";
+            FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+            fw.write(id+"#"+movies.get(id).getTitle() + "#" + user.getEmail() + "#" + strDate + "#" + user.getUsername() + "#" + user.getEmail() + "#" + cardDetail.getCardNo() + "\n");//appends the string to the file
+            fw.close();
+            System.out.println("\n\nPayment Deducted Succesfully\nSaved your data in the file successfully\nPress any key to restart the system");
+            scanner.nextLine();
+            clearScreen();
+        }
+        catch(IOException ioe)
+        {
+            System.err.println("IOException: " + ioe.getMessage());
+        }
+    }
+
+    public static void printMoviesBasicInfo(){
+
+        for (Movie movie : movies)
+        {
+            System.out.println("----- ID:" + movie.getId() + "-------");
+            System.out.println("Title:" + movie.getTitle());
+            System.out.println("Rating:" + movie.getRating());
+            System.out.println("Description:" + movie.getDescription()+"\n\n");
+        }
+
+    }
+
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    //Card detail
+    public static void getCardDetails(Scanner scanner){
+        String cardNo, title, expirydate, cvv;a
+
+        System.out.println("Enter Card Title name");
+        title = scanner.nextLine();
+
+        System.out.println("Enter Card Number");
+        cardNo = scanner.nextLine();
+
+        System.out.println("Enter Expiry Date");
+        expirydate = scanner.nextLine();
+
+        System.out.println("Enter CVV");
+        cvv = scanner.nextLine();
+
+        cardDetail = new CardDetail(cardNo, expirydate, title, cvv);
+    }
+
+}
